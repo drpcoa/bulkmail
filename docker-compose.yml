@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      # Mailcow configuration
+      - MAILCOW_API_KEY=${MAILCOW_API_KEY:-}
+      - MAILCOW_API_URL=${MAILCOW_API_URL:-}
+      # SMTP.com configuration
+      - SMTPCOM_API_KEY=${SMTPCOM_API_KEY:-}
+      - SMTPCOM_SENDER=${SMTPCOM_SENDER:-}
+      # ElasticEmail configuration
+      - ELASTIC_EMAIL_API_KEY=${ELASTIC_EMAIL_API_KEY:-}
+      - ELASTIC_EMAIL_FROM=${ELASTIC_EMAIL_FROM:-}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm run dev
+    restart: unless-stopped
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bulkmail
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
