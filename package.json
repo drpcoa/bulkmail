@@ -1,0 +1,41 @@
+{
+  "name": "bulkmail",
+  "version": "1.0.0",
+  "description": "Multi-provider bulk email system",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:backend && npm run install:frontend",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --watchAll=false --passWithNoTests",
+    "lint": "npm run lint:backend && npm run lint:frontend",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:frontend": "cd frontend && npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drpcoa/bulkmail.git"
+  },
+  "keywords": [
+    "email",
+    "bulk",
+    "mailcow",
+    "smtp",
+    "elasticemail"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/drpcoa/bulkmail/issues"
+  },
+  "homepage": "https://github.com/drpcoa/bulkmail#readme"
+}
