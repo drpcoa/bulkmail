@@ -50,16 +50,12 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |  
-            backend/package-lock.json
-            frontend/package-lock.json
       
       # Backend tests
       - name: Install backend dependencies
@@ -96,12 +92,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v2
         with:
@@ -136,6 +132,5 @@ jobs:
           script: |
             cd /path/to/bulkmail
             git pull origin main
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d --build
-            docker-compose -f docker-compose.prod.yml exec backend npx typeorm-ts-node-commonjs migration:run
+            docker-compose pull
+            docker-compose up -d
