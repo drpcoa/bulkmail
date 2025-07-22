@@ -62,9 +62,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-backend-
       
+      - name: Debug Node.js and npm versions
+        run: |
+          node -v
+          npm -v
+          
       - name: Install backend dependencies
         working-directory: ./backend
-        run: npm install --legacy-peer-deps
+        run: |
+          npm config set fund false
+          npm config set audit false
+          npm cache clean --force
+          npm install --legacy-peer-deps --no-audit --prefer-offline
         
       - name: Run backend tests
         working-directory: ./backend
@@ -91,7 +100,11 @@ jobs:
             
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm install --legacy-peer-deps
+        run: |
+          npm config set fund false
+          npm config set audit false
+          npm cache clean --force
+          npm install --legacy-peer-deps --no-audit --prefer-offline
         
       - name: Run frontend tests
         working-directory: ./frontend
