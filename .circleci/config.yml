@@ -1,0 +1,103 @@
+version: 2.1
+
+# Define reusable jobs and commands
+orbs:
+  node: circleci/node@5.0.2
+  docker: circleci/docker@2.7.0
+
+# Define reusable commands
+commands:
+  install_dependencies:
+    description: "Install project dependencies"
+    parameters:
+      working_directory:
+        type: string
+    steps:
+      - node/install:
+          node-version: '18'
+      - run:
+          name: Install Dependencies
+          command: |
+            cd << parameters.working_directory >>
+            npm ci --legacy-peer-deps
+
+  run_tests:
+    description: "Run tests"
+    parameters:
+      working_directory:
+        type: string
+    steps:
+      - run:
+          name: Run Tests
+          command: |
+            cd << parameters.working_directory >>
+            npm test
+
+  build_project:
+    description: "Build project"
+    parameters:
+      working_directory:
+        type: string
+    steps:
+      - run:
+          name: Build Project
+          command: |
+            cd << parameters.working_directory >>
+            npm run build
+
+# Define jobs
+jobs:
+  test_backend:
+    docker:
+      - image: cimg/node:18.17.1
+      - image: cimg/postgres:13.8
+        environment:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+      - image: cimg/redis:6.2
+    steps:
+      - checkout
+      - install_dependencies:
+          working_directory: backend
+      - run_tests:
+          working_directory: backend
+
+  test_frontend:
+    docker:
+      - image: cimg/node:18.17.1
+    steps:
+      - checkout
+      - install_dependencies:
+          working_directory: frontend
+      - run_tests:
+          working_directory: frontend
+
+  build:
+    docker:
+      - image: cimg/node:18.17.1
+    steps:
+      - checkout
+      - install_dependencies:
+          working_directory: backend
+      - install_dependencies:
+          working_directory: frontend
+      - build_project:
+          working_directory: backend
+      - build_project:
+          working_directory: frontend
+
+# Define workflows
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test_backend
+      - test_frontend
+      - build:
+          requires:
+            - test_backend
+            - test_frontend
+          filters:
+            branches:
+              only: main
